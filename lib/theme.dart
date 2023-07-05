@@ -3,8 +3,8 @@ import 'package:google_fonts/google_fonts.dart';
 
 double defaultMargin = 30.0;
 
-Color primaryColor = const Color(0xff5D3891);
-Color secondaryColor = const Color(0xffF99417);
+Color primaryColor = const Color(0xff116A7B);
+Color secondaryColor = const Color(0xffC2DEDC);
 Color alertColor = const Color(0xffED6363);
 
 // Mostly semua halaman pake background color ini
