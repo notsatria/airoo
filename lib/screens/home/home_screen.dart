@@ -30,7 +30,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
-    Widget radialGauge() {
+    Widget radialGauge(String nilaiSensor) {
       return Padding(
         padding: const EdgeInsets.only(top: 20.0),
         child: Center(
@@ -45,51 +45,67 @@ class _HomeScreenState extends State<HomeScreen> {
                   maximum: 1024,
                   ranges: <GaugeRange>[
                     GaugeRange(
+                      label: 'Normal',
+                      labelStyle: const GaugeTextStyle(
+                        color: Colors.white,
+                        fontWeight: FontWeight.bold,
+                      ),
                       startValue: 0,
                       endValue: 250,
-                      color: Colors.green,
-                      startWidth: 20,
-                      endWidth: 20,
+                      color: const Color(0xffBCE29E),
+                      startWidth: 25,
+                      endWidth: 25,
                     ),
                     GaugeRange(
+                      label: 'Peringatan',
+                      labelStyle: const GaugeTextStyle(
+                        color: Colors.black54,
+                        fontWeight: FontWeight.bold,
+                      ),
                       startValue: 250,
                       endValue: 700,
-                      color: Colors.yellow,
-                      startWidth: 20,
-                      endWidth: 20,
+                      color: const Color(0xffFAFCC2),
+                      startWidth: 25,
+                      endWidth: 25,
                     ),
                     GaugeRange(
+                      label: 'Bahaya',
+                      labelStyle: const GaugeTextStyle(
+                        color: Colors.white,
+                        fontWeight: FontWeight.bold,
+                      ),
                       startValue: 700,
                       endValue: 1024,
-                      color: Colors.red,
-                      startWidth: 20,
-                      endWidth: 20,
+                      color: const Color(0xffE97777),
+                      startWidth: 25,
+                      endWidth: 25,
                     ),
                   ],
-                  pointers: const <GaugePointer>[
+                  pointers: <GaugePointer>[
                     NeedlePointer(
                       value: 1024,
-                      needleColor: Colors.white,
+                      needleColor: primaryColor,
                       needleLength: 0.6,
                       knobStyle: KnobStyle(
-                        color: Colors.black,
+                        color: Colors.blueGrey[400],
                       ),
                     )
                   ],
                   annotations: <GaugeAnnotation>[
                     GaugeAnnotation(
-                        widget: Container(
-                          child: Text(
-                            sensor,
-                            style: const TextStyle(
-                              fontSize: 25,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.white,
-                            ),
+                      widget: Container(
+                        child: Text(
+                          nilaiSensor,
+                          style: TextStyle(
+                            fontSize: 25,
+                            fontWeight: FontWeight.bold,
+                            color: primaryColor,
                           ),
                         ),
-                        angle: 90,
-                        positionFactor: 0.5),
+                      ),
+                      angle: 90,
+                      positionFactor: 0.5,
+                    ),
                   ],
                 ),
               ],
@@ -102,9 +118,10 @@ class _HomeScreenState extends State<HomeScreen> {
     Widget textKualitasUdara() {
       return Text(
         'Kualitas Udara Normal',
-        style: whiteTextStyle.copyWith(
+        style: primaryTextStyle.copyWith(
           fontSize: 20,
-          fontWeight: semiBold,
+          fontWeight: bold,
+          color: primaryColor,
         ),
       );
     }
@@ -169,7 +186,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   width: double.infinity,
                   height: 320,
                   decoration: BoxDecoration(
-                    color: primaryColor,
+                    color: secondaryColor,
                     borderRadius: const BorderRadius.only(
                       bottomLeft: Radius.circular(16),
                       bottomRight: Radius.circular(16),
@@ -178,7 +195,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
                 Column(
                   children: [
-                    radialGauge(),
+                    radialGauge(sensor),
                     textKualitasUdara(),
                   ],
                 ),
