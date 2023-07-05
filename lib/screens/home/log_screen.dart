@@ -62,16 +62,57 @@ class LogScreen extends StatelessWidget {
           ));
     }
 
+    Widget cobaLogCard() {
+      return Container(
+        margin: const EdgeInsets.only(top: 6),
+        child: ListTile(
+          tileColor: secondaryColor,
+          subtitle: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                'Waktu Server: ',
+                style: primaryTextStyle.copyWith(
+                  fontSize: 14,
+                  fontWeight: reguler,
+                ),
+              ),
+              Text(
+                'Nilai Sensor: ',
+                style: primaryTextStyle.copyWith(
+                  fontSize: 14,
+                  fontWeight: reguler,
+                ),
+              ),
+              Text(
+                'Status Kipas: ',
+                style: primaryTextStyle.copyWith(
+                  fontSize: 14,
+                  fontWeight: reguler,
+                ),
+              ),
+              Text(
+                'Informasi: ',
+                style: primaryTextStyle.copyWith(
+                  fontSize: 14,
+                  fontWeight: reguler,
+                ),
+              ),
+            ],
+          ),
+        ),
+      );
+    }
+
     return SafeArea(
       child: Scaffold(
           body: ListView(
         children: [
-          const SizedBox(
-            height: 14,
-          ),
-          logCard(),
-          logCard(),
-          logCard(),
+          cobaLogCard(),
+          cobaLogCard(),
+          cobaLogCard(),
+          cobaLogCard(),
+          cobaLogCard(),
         ],
       )),
     );
