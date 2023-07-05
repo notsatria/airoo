@@ -27,11 +27,28 @@ class _SplashScreenState extends State<SplashScreen> {
     return Scaffold(
       backgroundColor: primaryColor,
       body: Center(
-          child: Text(
-        'Gas Detector',
-        style: subtitleTextStyle.copyWith(
-            fontSize: 32, fontWeight: semiBold, color: backgroundColor1),
-      )),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Text(
+              'Airoo',
+              style: subtitleTextStyle.copyWith(
+                fontSize: 40,
+                fontWeight: bold,
+                color: secondaryColor,
+              ),
+            ),
+            Text(
+              'Gas Leak Detector',
+              style: subtitleTextStyle.copyWith(
+                fontSize: 20,
+                fontWeight: reguler,
+                color: backgroundColor1,
+              ),
+            ),
+          ],
+        ),
+      ),
     );
   }
 }
