@@ -1,0 +1,46 @@
+{
+  "project_info": {
+    "project_number": "341024830914",
+    "project_id": "tubes-monitoring-udara",
+    "storage_bucket": "tubes-monitoring-udara.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:341024830914:android:8d62367cafe219fa19d25b",
+        "android_client_info": {
+          "package_name": "com.example.monitoring_kualitas_udara"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "341024830914-72en1hd607pum250c6jpc20apnh9mqnj.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD4-HyOemFUJjDpcgMW4PIRvExxo32F6sg"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "341024830914-72en1hd607pum250c6jpc20apnh9mqnj.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "341024830914-9qudn3s1ks5hsgv4as1das9sga326ege.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.monitoringKualitasUdara"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
