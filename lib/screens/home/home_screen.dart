@@ -1,3 +1,4 @@
+import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:syncfusion_flutter_gauges/gauges.dart';
@@ -12,20 +13,50 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  String sensor = '0';
+  Future<String>? dataSensorFuture;
+  String dataSensor = '0';
   bool statusKipas = false;
-  late DatabaseReference sensorRef;
+
+  // FirebaseDatabase db = FirebaseDatabase.instance;
+
+  final rtdb = FirebaseDatabase.instanceFor(
+      app: Firebase.app(),
+      databaseURL:
+          'https://tubes-monitoring-udara-default-rtdb.asia-southeast1.firebasedatabase.app/');
+
+  // DatabaseReference dbRef = FirebaseDatabase.instance.ref();
+
+  // get data from firebase and return the value
+  Future<String> getData() async {
+    // final snapshot = await rtdb.ref().child('sensor/mq2').get();
+    rtdb.ref().child('sensor/mq2').onValue.listen((event) {
+      print(event.snapshot.value);
+      setState(() {
+        dataSensor = event.snapshot.value.toString();
+      });
+    });
+
+    return dataSensor;
+
+    // if (snapshot.exists) {
+    //   final value = snapshot.value.toString();
+    //   setState(() {
+    //     dataSensor = value;
+    //   });
+    //   return value;
+    // } else {
+    //   print('No data available.');
+    //   return '';
+    // }
+  }
 
   @override
   void initState() {
+    // TODO: implement initState
     super.initState();
-    // final sensorRef = FirebaseDatabase.instance.ref();
-
-    // sensorRef.onValue.listen((DatabaseEvent event) {
-    //   setState(() {
-    //     sensor = event.snapshot.value.toString();
-    //   });
-    // });
+    setState(() {
+      dataSensorFuture = getData();
+    });
   }
 
   @override
@@ -55,6 +86,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       color: const Color(0xffBCE29E),
                       startWidth: 25,
                       endWidth: 25,
+                      
                     ),
                     GaugeRange(
                       label: 'Peringatan',
@@ -83,7 +115,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   ],
                   pointers: <GaugePointer>[
                     NeedlePointer(
-                      value: 1024,
+                      value: nilaiSensor == '0' ? 0 : double.parse(nilaiSensor),
                       needleColor: primaryColor,
                       needleLength: 0.6,
                       knobStyle: KnobStyle(
@@ -193,11 +225,26 @@ class _HomeScreenState extends State<HomeScreen> {
                     ),
                   ),
                 ),
-                Column(
-                  children: [
-                    radialGauge(sensor),
-                    textKualitasUdara(),
-                  ],
+                Center(
+                  child: Column(
+                    children: [
+                      // FutureBuilder<String>(
+                      //     future: dataSensorFuture,
+                      //     builder: (context, snapshot) {
+                      //       if (snapshot.hasData) {
+                      //         final dataSensorValue = snapshot.data.toString();
+                      //         return radialGauge(dataSensorValue);
+                      //       } else if (snapshot.hasError) {
+                      //         return Text('Error ${snapshot.error}');
+                      //       } else {
+                      //         return const CircularProgressIndicator();
+                      //       }
+                      //     }),
+
+                      radialGauge(dataSensor),
+                      textKualitasUdara(),
+                    ],
+                  ),
                 ),
               ],
             ),

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:monitoring_kualitas_udara/theme.dart';
+
+import '../../theme.dart';
 
 class LogScreen extends StatelessWidget {
   const LogScreen({super.key});
