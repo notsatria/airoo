@@ -23,10 +23,10 @@ class _SlideScreenState extends State<SlideScreen> {
     listSliderContent.add(
       ContentConfig(
         description:
-            'Airoo memudahkan anda untuk memantau kualitas udara di sekitar anda secara realtime tanpa harus keluar rumah',
+            'Airoo memudahkan anda untuk memantau kualitas udara di sekitar anda secara realtime',
         pathImage: 'assets/gas.png',
         widthImage: 300,
-        backgroundColor: secondaryColor,
+        backgroundColor: primaryColor,
         styleDescription: whiteTextStyle.copyWith(
           fontSize: 16,
           fontWeight: medium,
@@ -36,10 +36,10 @@ class _SlideScreenState extends State<SlideScreen> {
     listSliderContent.add(
       ContentConfig(
         description:
-            'Airoo menggunakan sensor gas dengan teknologi MQ-2 untuk mendeteksi kebocoran gas di udara',
+            'Airoo menggunakan sensor gas dengan teknologi sensor MQ-2 untuk mendeteksi kebocoran gas di udara',
         pathImage: 'assets/sensor.png',
         widthImage: 300,
-        backgroundColor: secondaryColor,
+        backgroundColor: primaryColor,
         styleDescription: whiteTextStyle.copyWith(
           fontSize: 16,
           fontWeight: medium,
@@ -52,7 +52,7 @@ class _SlideScreenState extends State<SlideScreen> {
             'Airoo akan memberikan notifikasi kepada anda jika terdeteksi kebocoran gas di rumah anda',
         pathImage: 'assets/notification.png',
         widthImage: 300,
-        backgroundColor: secondaryColor,
+        backgroundColor: primaryColor,
         styleDescription: whiteTextStyle.copyWith(
           fontSize: 16,
           fontWeight: medium,
@@ -80,10 +80,10 @@ class _SlideScreenState extends State<SlideScreen> {
         foregroundColor: backgroundColor1,
       ),
       skipButtonStyle: TextButton.styleFrom(
-        foregroundColor: primaryColor,
+        foregroundColor: secondaryColor,
       ),
       doneButtonStyle: TextButton.styleFrom(
-        foregroundColor: primaryColor,
+        foregroundColor: secondaryColor,
       ),
     );
   }

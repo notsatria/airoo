@@ -5,6 +5,7 @@ import 'firebase_options.dart';
 import 'screens/home/main_screen.dart';
 import 'screens/login_screen.dart';
 import 'screens/sign_up_screen.dart';
+import 'screens/slide_screen.dart';
 import 'screens/splash_screen.dart';
 
 Future<void> main() async {
@@ -28,6 +29,7 @@ class MyApp extends StatelessWidget {
         LoginScreen.routeName: (context) => const LoginScreen(),
         SignUpScreen.routeName: (context) => const SignUpScreen(),
         MainScreen.routeName: (context) => const MainScreen(),
+        SlideScreen.routeName: (context) => const SlideScreen(),
       },
     );
   }
