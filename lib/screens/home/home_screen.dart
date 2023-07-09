@@ -53,23 +53,25 @@ class _HomeScreenState extends State<HomeScreen> {
 
   // get data from firebase and return the value
   Future<String> getDataSensor() async {
-    // final snapshot = await rtdb.ref().child('sensor/mq2').get();
     rtdb.ref().child('sensor/mq2').onValue.listen((event) {
       print(event.snapshot.value);
+      final String updatedDataSensor = event.snapshot.value.toString();
       setState(() {
-        dataSensor = event.snapshot.value.toString();
+        dataSensor = updatedDataSensor;
       });
-      if (int.parse(dataSensor) > 700) _showNotificationWithoutSound();
+      if (int.parse(updatedDataSensor) > 700) {
+        _showNotificationWithoutSound();
+      }
     });
-
     return dataSensor;
   }
 
   Future<bool> getKipasStatus() async {
     rtdb.ref().child('kipas').onValue.listen((event) {
       print(event.snapshot.value);
+      final bool updatedStatusKipas = event.snapshot.value.toString() == 'true';
       setState(() {
-        statusKipas = event.snapshot.value.toString() == 'true' ? true : false;
+        statusKipas = updatedStatusKipas;
       });
     });
     return statusKipas;
@@ -79,10 +81,9 @@ class _HomeScreenState extends State<HomeScreen> {
   void initState() {
     // TODO: implement initState
     super.initState();
-    setState(() {
-      dataSensorFuture = getDataSensor();
-      dataKipasFuture = getKipasStatus();
-    });
+
+    dataSensorFuture = getDataSensor();
+    dataKipasFuture = getKipasStatus();
 
     const AndroidInitializationSettings initializationSettingsAndroid =
         AndroidInitializationSettings('@mipmap/ic_launcher');
