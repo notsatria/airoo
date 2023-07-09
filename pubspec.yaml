@@ -39,6 +39,8 @@ dependencies:
   firebase_core: ^2.14.0
   firebase_database: ^10.2.3
   intro_slider: ^4.2.0
+  flutter_local_notifications: ^10.0.0
+  rxdart: ^0.27.7
 
 dev_dependencies:
   flutter_test:

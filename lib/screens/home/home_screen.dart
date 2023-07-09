@@ -1,11 +1,13 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:syncfusion_flutter_gauges/gauges.dart';
 
 import '../../theme.dart';
 
 class HomeScreen extends StatefulWidget {
+  static const routeName = '/home-screen';
   const HomeScreen({Key? key}) : super(key: key);
 
   @override
@@ -14,8 +16,11 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   Future<String>? dataSensorFuture;
+  Future<bool>? dataKipasFuture;
   String dataSensor = '0';
   bool statusKipas = false;
+  FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
+      FlutterLocalNotificationsPlugin();
 
   // FirebaseDatabase db = FirebaseDatabase.instance;
 
@@ -26,28 +31,48 @@ class _HomeScreenState extends State<HomeScreen> {
 
   // DatabaseReference dbRef = FirebaseDatabase.instance.ref();
 
+  Future _showNotificationWithoutSound() async {
+    var androidPlatformChannelSpecifics = const AndroidNotificationDetails(
+        'AirooID', 'Airoo',
+        channelDescription: 'Airoo Notification',
+        playSound: true,
+        importance: Importance.max,
+        priority: Priority.high);
+
+    var platformChannelSpecifics =
+        NotificationDetails(android: androidPlatformChannelSpecifics);
+    await flutterLocalNotificationsPlugin.show(
+      0,
+      'Bahaya',
+      'Ada kebocoran gas di rumahmu! Segera pastikan agar terhindar dari hal yang tidak diinginkan',
+      platformChannelSpecifics,
+      payload:
+          'Segera pastikan gas Anda agar terhindar dari hal yang tidak diinginkan',
+    );
+  }
+
   // get data from firebase and return the value
-  Future<String> getData() async {
+  Future<String> getDataSensor() async {
     // final snapshot = await rtdb.ref().child('sensor/mq2').get();
     rtdb.ref().child('sensor/mq2').onValue.listen((event) {
       print(event.snapshot.value);
       setState(() {
         dataSensor = event.snapshot.value.toString();
       });
+      if (int.parse(dataSensor) > 700) _showNotificationWithoutSound();
     });
 
     return dataSensor;
+  }
 
-    // if (snapshot.exists) {
-    //   final value = snapshot.value.toString();
-    //   setState(() {
-    //     dataSensor = value;
-    //   });
-    //   return value;
-    // } else {
-    //   print('No data available.');
-    //   return '';
-    // }
+  Future<bool> getKipasStatus() async {
+    rtdb.ref().child('kipas').onValue.listen((event) {
+      print(event.snapshot.value);
+      setState(() {
+        statusKipas = event.snapshot.value.toString() == 'true' ? true : false;
+      });
+    });
+    return statusKipas;
   }
 
   @override
@@ -55,12 +80,54 @@ class _HomeScreenState extends State<HomeScreen> {
     // TODO: implement initState
     super.initState();
     setState(() {
-      dataSensorFuture = getData();
+      dataSensorFuture = getDataSensor();
+      dataKipasFuture = getKipasStatus();
     });
+
+    const AndroidInitializationSettings initializationSettingsAndroid =
+        AndroidInitializationSettings('@mipmap/ic_launcher');
+
+    const InitializationSettings initializationSettings =
+        InitializationSettings(
+      android: initializationSettingsAndroid,
+    );
+
+    flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
+    flutterLocalNotificationsPlugin.initialize(
+      initializationSettings,
+    );
   }
+
+  // Method 3
 
   @override
   Widget build(BuildContext context) {
+    // widget alert dialog untuk notification
+    Future onSelectNotification(String payload) async {
+      showDialog(
+        context: context,
+        builder: (_) => AlertDialog(
+          title: const Text("Payload"),
+          content: Text("Payload: $payload"),
+        ),
+      );
+    }
+
+    Widget alertDialog() {
+      return AlertDialog(
+        title: const Text('Title'),
+        content: const Text('message'),
+        actions: [
+          TextButton(
+            onPressed: () {
+              Navigator.of(context).pop();
+            },
+            child: const Text('OK'),
+          ),
+        ],
+      );
+    }
+
     Widget radialGauge(String nilaiSensor) {
       return Padding(
         padding: const EdgeInsets.only(top: 20.0),
@@ -72,6 +139,7 @@ class _HomeScreenState extends State<HomeScreen> {
               animationDuration: 5000,
               axes: <RadialAxis>[
                 RadialAxis(
+                  canRotateLabels: true,
                   minimum: 0,
                   maximum: 1024,
                   ranges: <GaugeRange>[
@@ -82,11 +150,10 @@ class _HomeScreenState extends State<HomeScreen> {
                         fontWeight: FontWeight.bold,
                       ),
                       startValue: 0,
-                      endValue: 250,
+                      endValue: 350,
                       color: const Color(0xffBCE29E),
                       startWidth: 25,
                       endWidth: 25,
-                      
                     ),
                     GaugeRange(
                       label: 'Peringatan',
@@ -94,7 +161,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         color: Colors.black54,
                         fontWeight: FontWeight.bold,
                       ),
-                      startValue: 250,
+                      startValue: 350,
                       endValue: 700,
                       color: const Color(0xffFAFCC2),
                       startWidth: 25,
@@ -149,7 +216,11 @@ class _HomeScreenState extends State<HomeScreen> {
 
     Widget textKualitasUdara() {
       return Text(
-        'Kualitas Udara Normal',
+        int.parse(dataSensor) > 700
+            ? 'Kualitas Udara Buruk'
+            : int.parse(dataSensor) > 350
+                ? 'Kualitas Udara Sedang'
+                : 'Kualitas Udara Normal',
         style: primaryTextStyle.copyWith(
           fontSize: 20,
           fontWeight: bold,
@@ -158,7 +229,7 @@ class _HomeScreenState extends State<HomeScreen> {
       );
     }
 
-    Widget switchKipas() {
+    Widget switchKipas(bool statusKipas) {
       return Container(
         height: 80,
         padding: const EdgeInsets.symmetric(horizontal: 10),
@@ -251,7 +322,7 @@ class _HomeScreenState extends State<HomeScreen> {
             const SizedBox(
               height: 30,
             ),
-            switchKipas(),
+            switchKipas(statusKipas),
           ],
         ),
       ),
