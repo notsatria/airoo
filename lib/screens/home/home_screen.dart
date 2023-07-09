@@ -2,6 +2,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:monitoring_kualitas_udara/screens/home/main_screen.dart';
 import 'package:syncfusion_flutter_gauges/gauges.dart';
 
 import '../../theme.dart';
@@ -19,6 +20,8 @@ class _HomeScreenState extends State<HomeScreen> {
   Future<bool>? dataKipasFuture;
   String dataSensor = '0';
   bool statusKipas = false;
+  bool showAlert = false;
+
   FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
       FlutterLocalNotificationsPlugin();
 
@@ -56,9 +59,11 @@ class _HomeScreenState extends State<HomeScreen> {
     rtdb.ref().child('sensor/mq2').onValue.listen((event) {
       print(event.snapshot.value);
       final String updatedDataSensor = event.snapshot.value.toString();
+
       setState(() {
         dataSensor = updatedDataSensor;
       });
+
       if (int.parse(updatedDataSensor) > 700) {
         _showNotificationWithoutSound();
       }
@@ -70,6 +75,7 @@ class _HomeScreenState extends State<HomeScreen> {
     rtdb.ref().child('kipas').onValue.listen((event) {
       print(event.snapshot.value);
       final bool updatedStatusKipas = event.snapshot.value.toString() == 'true';
+
       setState(() {
         statusKipas = updatedStatusKipas;
       });
@@ -104,24 +110,20 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     // widget alert dialog untuk notification
-    Future onSelectNotification(String payload) async {
-      showDialog(
-        context: context,
-        builder: (_) => AlertDialog(
-          title: const Text("Payload"),
-          content: Text("Payload: $payload"),
-        ),
-      );
-    }
 
-    Widget alertDialog() {
+    Widget alertDialog(BuildContext context) {
       return AlertDialog(
-        title: const Text('Title'),
-        content: const Text('message'),
+        title: const Text('Warning'),
+        content: const Text(
+            'Ada kebocoran gas di rumahmu! Tolong perhatikan segera'),
         actions: [
           TextButton(
             onPressed: () {
-              Navigator.of(context).pop();
+              setState(() {
+                showAlert = false;
+              });
+              Navigator.pushReplacementNamed(context, MainScreen.routeName);
+              // Navigator.of(context).pop();
             },
             child: const Text('OK'),
           ),
@@ -280,50 +282,54 @@ class _HomeScreenState extends State<HomeScreen> {
       );
     }
 
+    if (dataSensorFuture == null || dataKipasFuture == null) {
+      return const Center(
+        child: CircularProgressIndicator(),
+      );
+    }
+
+    if (int.parse(dataSensor) > 700) {
+      setState(() {
+        showAlert = true;
+      });
+    }
+
     return SafeArea(
       child: Scaffold(
-        body: Column(
+        body: Stack(
           children: [
-            Stack(
+            Column(
               children: [
-                Container(
-                  width: double.infinity,
-                  height: 320,
-                  decoration: BoxDecoration(
-                    color: secondaryColor,
-                    borderRadius: const BorderRadius.only(
-                      bottomLeft: Radius.circular(16),
-                      bottomRight: Radius.circular(16),
+                Stack(
+                  children: [
+                    Container(
+                      width: double.infinity,
+                      height: 320,
+                      decoration: BoxDecoration(
+                        color: secondaryColor,
+                        borderRadius: const BorderRadius.only(
+                          bottomLeft: Radius.circular(16),
+                          bottomRight: Radius.circular(16),
+                        ),
+                      ),
                     ),
-                  ),
+                    Center(
+                      child: Column(
+                        children: [
+                          radialGauge(dataSensor),
+                          textKualitasUdara(),
+                        ],
+                      ),
+                    ),
+                  ],
                 ),
-                Center(
-                  child: Column(
-                    children: [
-                      // FutureBuilder<String>(
-                      //     future: dataSensorFuture,
-                      //     builder: (context, snapshot) {
-                      //       if (snapshot.hasData) {
-                      //         final dataSensorValue = snapshot.data.toString();
-                      //         return radialGauge(dataSensorValue);
-                      //       } else if (snapshot.hasError) {
-                      //         return Text('Error ${snapshot.error}');
-                      //       } else {
-                      //         return const CircularProgressIndicator();
-                      //       }
-                      //     }),
-
-                      radialGauge(dataSensor),
-                      textKualitasUdara(),
-                    ],
-                  ),
+                const SizedBox(
+                  height: 30,
                 ),
+                switchKipas(statusKipas),
               ],
             ),
-            const SizedBox(
-              height: 30,
-            ),
-            switchKipas(statusKipas),
+            if (showAlert) alertDialog(context),
           ],
         ),
       ),

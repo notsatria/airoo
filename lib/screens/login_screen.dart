@@ -1,13 +1,24 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
 import '../theme.dart';
 import 'home/main_screen.dart';
 import 'sign_up_screen.dart';
 
-class LoginScreen extends StatelessWidget {
+class LoginScreen extends StatefulWidget {
   static const routeName = '/login-screen';
 
   const LoginScreen({super.key});
+
+  @override
+  State<LoginScreen> createState() => _LoginScreenState();
+}
+
+class _LoginScreenState extends State<LoginScreen> {
+  final _emailController = TextEditingController();
+  final _passwordController = TextEditingController();
+  final _auth = FirebaseAuth.instance;
+  bool _isLoading = false;
 
   @override
   Widget build(BuildContext context) {
@@ -50,6 +61,7 @@ class LoginScreen extends StatelessWidget {
           ),
           child: Center(
             child: TextFormField(
+              controller: _emailController,
               style: primaryTextStyle,
               decoration: InputDecoration.collapsed(
                 hintText: 'E-mail',
@@ -73,6 +85,7 @@ class LoginScreen extends StatelessWidget {
           ),
           child: Center(
             child: TextFormField(
+              controller: _passwordController,
               style: primaryTextStyle,
               obscureText: true,
               decoration: InputDecoration.collapsed(
@@ -105,9 +118,28 @@ class LoginScreen extends StatelessWidget {
         margin: const EdgeInsets.only(top: 30),
         height: 50,
         child: ElevatedButton(
-          onPressed: () {
-            Navigator.pushReplacementNamed(context, MainScreen.routeName);
-            // print("object");
+          onPressed: () async {
+            setState(() {
+              _isLoading = true;
+            });
+
+            try {
+              final email = _emailController.text;
+              final password = _passwordController.text;
+
+              await _auth.signInWithEmailAndPassword(
+                email: email,
+                password: password,
+              );
+              Navigator.pushReplacementNamed(context, MainScreen.routeName);
+            } catch (e) {
+              final snackbar = SnackBar(content: Text(e.toString()));
+              ScaffoldMessenger.of(context).showSnackBar(snackbar);
+            } finally {
+              setState(() {
+                _isLoading = false;
+              });
+            }
           },
           style: ElevatedButton.styleFrom(
             backgroundColor: primaryColor,
@@ -162,14 +194,23 @@ class LoginScreen extends StatelessWidget {
         backgroundColor: backgroundColor1,
         body: Container(
           margin: EdgeInsets.symmetric(horizontal: defaultMargin),
-          child: Column(
+          child: Stack(
             children: [
-              header(),
-              emailInput(),
-              passwordInput(),
-              const SizedBox(height: 20),
-              buttonLogin(),
-              textSignUp(),
+              Column(
+                children: [
+                  header(),
+                  emailInput(),
+                  passwordInput(),
+                  const SizedBox(height: 20),
+                  buttonLogin(),
+                  textSignUp(),
+                ],
+              ),
+              _isLoading
+                  ? const Center(
+                      child: CircularProgressIndicator(),
+                    )
+                  : const SizedBox(),
             ],
           ),
         ),

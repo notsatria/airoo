@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
 import '../theme.dart';
@@ -15,6 +16,9 @@ class _SignUpScreenState extends State<SignUpScreen> {
   final _nameController = TextEditingController();
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
+  final _auth = FirebaseAuth.instance;
+
+  bool _isLoading = false;
 
   @override
   Widget build(BuildContext context) {
@@ -148,8 +152,32 @@ class _SignUpScreenState extends State<SignUpScreen> {
         margin: const EdgeInsets.only(top: 30),
         height: 50,
         child: ElevatedButton(
-          onPressed: () {
-            //
+          onPressed: () async {
+            setState(() {
+              _isLoading = true;
+            });
+
+            try {
+              final email = _emailController.text;
+              final password = _passwordController.text;
+
+              await _auth.createUserWithEmailAndPassword(
+                email: email,
+                password: password,
+              );
+
+              Navigator.pop(context);
+            } catch (e) {
+              final snackBar = SnackBar(
+                content: Text(e.toString()),
+                backgroundColor: alertColor,
+              );
+              ScaffoldMessenger.of(context).showSnackBar(snackBar);
+            } finally {
+              setState(() {
+                _isLoading = false;
+              });
+            }
           },
           style: ElevatedButton.styleFrom(
             backgroundColor: primaryColor,
@@ -204,15 +232,24 @@ class _SignUpScreenState extends State<SignUpScreen> {
         backgroundColor: backgroundColor1,
         body: Container(
           margin: EdgeInsets.symmetric(horizontal: defaultMargin),
-          child: Column(
+          child: Stack(
             children: [
-              header(),
-              namaInput(),
-              emailInput(),
-              passwordInput(),
-              passwordConfirmationInput(),
-              buttonSignUp(),
-              textLogin(),
+              Column(
+                children: [
+                  header(),
+                  namaInput(),
+                  emailInput(),
+                  passwordInput(),
+                  passwordConfirmationInput(),
+                  buttonSignUp(),
+                  textLogin(),
+                ],
+              ),
+              _isLoading
+                  ? const Center(
+                      child: CircularProgressIndicator(),
+                    )
+                  : const SizedBox(),
             ],
           ),
         ),

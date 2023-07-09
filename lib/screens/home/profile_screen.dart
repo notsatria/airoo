@@ -1,11 +1,19 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:monitoring_kualitas_udara/screens/login_screen.dart';
 
 import '../../theme.dart';
 
-class ProfileScreen extends StatelessWidget {
+class ProfileScreen extends StatefulWidget {
   static const routeName = '/profile-screen';
   const ProfileScreen({super.key});
 
+  @override
+  State<ProfileScreen> createState() => _ProfileScreenState();
+}
+
+class _ProfileScreenState extends State<ProfileScreen> {
+  final _auth = FirebaseAuth.instance;
   @override
   Widget build(BuildContext context) {
     Widget profileHeader() {
@@ -39,8 +47,9 @@ class ProfileScreen extends StatelessWidget {
               color: alertColor,
               size: 30,
             ),
-            onPressed: () {
-              //
+            onPressed: () async {
+              await _auth.signOut();
+              Navigator.pushReplacementNamed(context, LoginScreen.routeName);
             },
           ),
         ),
